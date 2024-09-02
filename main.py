@@ -2,6 +2,7 @@
 import yaml
 from joblib import dump, load
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 # Naive Bayes Approach
@@ -74,15 +75,33 @@ class DiseasePrediction:
         return test_features, test_labels, df_test
 
     # Features Correlation
+#     def _feature_correlation(self, data_frame=None, show_fig=False):
+#         # Get Feature Correlation
+#         corr = data_frame.corr()
+#         sn.heatmap(corr, square=True, annot=False, cmap="YlGnBu")
+#         plt.title("Feature Correlation")
+#         plt.tight_layout()
+#         if show_fig:
+#             plt.show()
+#         plt.savefig('feature_correlation.png')
+
+# Features Correlation
     def _feature_correlation(self, data_frame=None, show_fig=False):
-        # Get Feature Correlation
-        corr = data_frame.corr()
+        # Filter out non-numeric columns
+        numeric_cols = data_frame.select_dtypes(include=[np.number]).columns
+
+        # Get Feature Correlation for numeric columns
+        corr = data_frame[numeric_cols].corr()
+
+        # Plot heatmap
         sn.heatmap(corr, square=True, annot=False, cmap="YlGnBu")
         plt.title("Feature Correlation")
         plt.tight_layout()
+
         if show_fig:
             plt.show()
         plt.savefig('feature_correlation.png')
+
 
     # Dataset Train Validation Split
     def _train_val_split(self):
@@ -159,7 +178,7 @@ class DiseasePrediction:
 
 if __name__ == "__main__":
     # Model Currently Training
-    current_model_name = 'decision_tree'
+    current_model_name = 'gradient_boost'
     # Instantiate the Class
     dp = DiseasePrediction(model_name=current_model_name)
     # Train the Model
@@ -168,3 +187,4 @@ if __name__ == "__main__":
     test_accuracy, classification_report = dp.make_prediction(saved_model_name=current_model_name)
     print("Model Test Accuracy: ", test_accuracy)
     print("Test Data Classification Report: \n", classification_report)
+
